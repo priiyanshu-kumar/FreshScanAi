@@ -20,8 +20,10 @@ useEffect(() => {
   const completed = localStorage.getItem("tour-completed");
 
   if (!completed) {
-    setRunTour(true);
-    localStorage.setItem("tour-completed", "true");
+    setTimeout(() => {
+      setRunTour(true);
+      localStorage.setItem("tour-completed", "true");
+    }, 0);
   }
 }, []);
   return (

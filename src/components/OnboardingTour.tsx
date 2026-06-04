@@ -27,8 +27,6 @@ export default function OnboardingTour({ run }: Props) {
       steps={steps}
       run={run}
       continuous
-      showSkipButton
-      showProgress
     />
   );
 }
