@@ -10,8 +10,10 @@ import ScannerPage from './pages/ScannerPage';
 import AnalysisDashboard from './pages/AnalysisDashboard';
 import MarketMapPage from './pages/MarketMapPage';
 import ResultsPage from './pages/ResultsPage';
+import Leaderboard from './pages/Leaderboard';
 import PostHogPageView from './components/PostHogPageView';
 import NotFound from './pages/NotFound';
+import PublicReport from "./pages/PublicReport";
 
 export default function App() {
   const [runTour, setRunTour] = useState(false);
@@ -43,8 +45,12 @@ useEffect(() => {
           <Route path="/scanner" element={<ScannerPage />} />
           <Route path="/analysis" element={<AnalysisDashboard />} />
           <Route path="/map" element={<MarketMapPage />} />
+          <Route path="/leaderboard" element={<Leaderboard />} />
           <Route path="/results" element={<ResultsPage />} />
           
+          {/* Public shareable report — MUST be before the * catchall */}
+          <Route path="/report/:id" element={<PublicReport />} />
+
           {/* Catch-all route for broken links/404s */}
           <Route path="*" element={<NotFound />} />
         </Route>
