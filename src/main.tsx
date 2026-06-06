@@ -13,7 +13,15 @@ initTheme();
 // PostHog is only initialized when the key is present.
 // Contributors running locally without the key will have it silently disabled.
 const POSTHOG_KEY = import.meta.env.VITE_POSTHOG_KEY as string | undefined;
-const POSTHOG_HOST = (import.meta.env.VITE_POSTHOG_HOST as string | undefined) ?? 'https://us.i.posthog.com';
+
+// Use the current domain's /ingest proxy in production so PostHog events
+// always route through vercel.json rewrites → us.i.posthog.com.
+// This prevents stale env vars ever pointing to the wrong Vercel deployment.
+// In local dev fall back to direct PostHog (no proxy needed).
+const _isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+const POSTHOG_HOST =
+  (import.meta.env.VITE_POSTHOG_HOST as string | undefined) ??
+  (_isLocalhost ? 'https://us.i.posthog.com' : window.location.origin);
 
 if (POSTHOG_KEY) {
   posthog.init(POSTHOG_KEY, {

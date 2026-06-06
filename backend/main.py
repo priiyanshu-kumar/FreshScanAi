@@ -100,8 +100,16 @@ _cors_origins = (
     if CORS_ALLOW_ALL
     else [
         FRONTEND_URL,
-        # Always allow Vercel preview deployments
-        "https://fresh-scan-ai-sage.vercel.app",
+        # Current production frontend — always allow so a stale FRONTEND_URL
+        # env var doesn't lock out users.
+        "https://fresh-scanai.vercel.app",
+        # Extra comma-separated origins from env (e.g. preview deployments).
+        # ADDITIONAL_CORS_ORIGINS=https://preview.vercel.app,https://staging.example.com
+        *[
+            o.strip()
+            for o in os.environ.get("ADDITIONAL_CORS_ORIGINS", "").split(",")
+            if o.strip()
+        ],
     ]
 )
 
