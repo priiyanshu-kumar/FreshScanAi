@@ -4,6 +4,7 @@ import { Camera, Zap, RotateCcw, FlashlightOff, Flashlight, SwitchCamera, Upload
 import StatusTerminal from '../components/StatusTerminal';
 import { api, isAuthenticated } from '../lib/api';
 import { FishFreshnessInference } from '../fusionInference.js';
+import type { ScanResult } from '../lib/types';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -170,20 +171,20 @@ export default function ScannerPage() {
       const online = await api.scanOnline(blob);
 
       if (online) {
-        // Cloud inference succeeded
-        const s = online.scan;
-        const freshness = s.freshness_index ?? Math.round((s as unknown as { score?: number }).score ?? 0);
+        // Cloud inference succeeded — use typed ScanResult fields directly
+        const s: ScanResult = online.scan;
+        const freshness = s.freshness_index;
         stopProgress(100);
         setInferenceMode('cloud');
         setResult({
-          label:      freshness >= 60 ? 'Fresh' : freshness >= 35 ? 'Moderate' : 'Spoiled',
+          label:      s.is_fresh ? (freshness >= 80 ? 'Fresh' : 'Moderate') : 'Spoiled',
           freshness,
-          grade:      (s as unknown as { grade?: string }).grade ?? deriveGrade(freshness),
-          confidence: `${Math.round(((s as unknown as { confidence_score?: number }).confidence_score ?? 0.9) * 100)}%`,
+          grade:      s.grade,
+          confidence: `${Math.round((s.confidence ?? 0.9) * 100)}%`,
         });
 
-        if ((s as unknown as { scan_id?: string }).scan_id) {
-          sessionStorage.setItem('lastScanId', (s as unknown as { scan_id: string }).scan_id);
+        if (s.scan_id) {
+          sessionStorage.setItem('lastScanId', s.scan_id);
         }
         setScanPhase('done');
         setTimeout(() => navigate('/analysis'), 1800);
